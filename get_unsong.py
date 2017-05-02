@@ -21,9 +21,9 @@ header = """<!doctype html>
 <body>
 """
 footer = """<hr><article>
-<p>Complete up to the date of creation of this ebook, which was %s.</p>
+<p>Complete up to the date of creation of this ebook, which was <date>%s</date>.</p>
 <p>Made from <a href="http://unsongbook.com/">the Unsong book website</a> by
-the <a href="">Unsong fetcher script</a> 
+the <a href="https://github.com/stuartlangridge/unsong-book-fetcher">Unsong fetcher script</a> 
 by <a href="https://kryogenix.org">Stuart Langridge</a>.</p>
 </article>
 </body></html>""" % (datetime.datetime.now(),)
@@ -144,7 +144,18 @@ def put_cached_parsed(url, data):
     json.dump(data, fp)
     fp.close()
 
+def remove_cache(url):
+    # first remove the HTML cache
+    slug = slugify(url)
+    slug = "cache/%s" % slug
+    if os.path.exists(slug): os.unlink(slug)
+    # next, remove the cached parsed
+    slug = "CACHED_PARSED_%s" % (slugify(url),)
+    slug = "cache/%s" % slug
+    if os.path.exists(slug): os.unlink(slug)
+
 def get_url(url):
+    global ALL_CACHED
     data = fetch_or_get(url, binary=False)
     cached_parsed = get_cached_parsed(url)
     if cached_parsed:
@@ -189,10 +200,13 @@ def get_url(url):
     html = '<article class="%s">\n%s\n%s\n</article>\n' % (details["type"], heading, content)
     output = (prev, html, details, next)
     put_cached_parsed(url, output)
+    ALL_CACHED = False
 
     return output
 
 def get_next(next):
+    global AUTHOR_NOTES, CHAPTERS, FORCE
+    last_fetched = next
     previous, html, details, next = get_url(next)
     if details["type"] == "author note":
         AUTHOR_NOTES.append(html)
@@ -201,7 +215,24 @@ def get_next(next):
     if next:
         get_next(next)
     else:
+        if ALL_CACHED:
+            if FORCE:
+                print("Forcing")
+                if details["type"] == "author note":
+                    AUTHOR_NOTES= AUTHOR_NOTES[:-1]
+                else:
+                    CHAPTERS = CHAPTERS[:-1]
+                remove_cache(last_fetched)
+                get_next(last_fetched)
+            else:
+                print("Whole book retrieved from cache.")
+                print("To force an update (to pull in more recent chapters), pass --force parameter.")
         create_book()
 
+FORCE = False
+ALL_CACHED = True
+
 if __name__ == "__main__":
+    if "--force" in sys.argv:
+        FORCE = True
     get_next("http://unsongbook.com/prologue-2/")

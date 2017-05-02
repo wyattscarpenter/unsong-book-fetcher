@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo Fetching book
-python3 get_unsong.py
+python3 get_unsong.py $*
 
 echo Making ebook
 ebook-convert Unsong.html Unsong.epub \
