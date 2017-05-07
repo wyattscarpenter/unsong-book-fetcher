@@ -29,6 +29,7 @@ def get_initials_of_chapters():
     ci = []
     soup = load_soup()
     chapter_headings = soup.find_all("h2")
+    print("Extracting chapter initials...")
     for ch in chapter_headings:
         if "Chapter" not in ch.text: continue
         content = ch.parent.find_all("div", "pjgm-postcontent")
@@ -41,9 +42,15 @@ def get_initials_of_chapters():
         # removes the dates at the start)
         for fnt in content[0].find_all("font"):
             fnt.extract()
+        # remove all paragraphs which just have I. or II. in them (subchapter headers)
+        for p in content[0].find_all("p"):
+            if p.text in ["I.", "II.", "III."]:
+                p.extract()
         txt = content[0].text[0:100].strip().upper()
         txt = re.sub(r"[^A-Z]", "", txt)
         ci.append(txt[0])
+        print(ch.text[:20] + "...", "->", txt[:20], "->", txt[0])
+    print()
     return ci
 
 def get_initials_of_book():
@@ -72,6 +79,7 @@ def get_initials_of_book():
     return bi
 
 def find_lcs(ci, bi):
+    print("Longest common subsequences...")
     cistr = "".join(ci)
     bistr = "".join([x[0] for x in bi])
     # we have to put the longer one first
@@ -79,15 +87,14 @@ def find_lcs(ci, bi):
     for m in sorted(s.get_matching_blocks(), key=lambda a: a[2], reverse=True):
         bistart, cistart, length = m
         if length < 3: continue
-        cisubstr = cistr[cistart:cistart+length]
-        cispaces = " " * cistart
+        cicombined = cistr[:cistart] + " >" + cistr[cistart:cistart+length] + "< " + cistr[cistart+length:]
         bisubstr = []
         for i in range(bistart, bistart+length):
             bisubstr.append(bi[i][1])
         bisubstr = " ".join(bisubstr)
         bichapter = bi[bistart][2]
-        print('%s\n%s%s\n"%s" (%s)' % (
-            cistr, cispaces, cisubstr, bisubstr, bichapter
+        print('%s\n%s\n"%s"' % (
+            bichapter, cicombined, bisubstr
             ))
         print()
 
