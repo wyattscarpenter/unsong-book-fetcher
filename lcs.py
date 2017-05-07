@@ -25,7 +25,8 @@ def load_soup():
     soup = BeautifulSoup(data, "lxml")
     return soup
 
-def get_initials_of_chapters():
+def get_initials():
+    bi = []
     ci = []
     soup = load_soup()
     chapter_headings = soup.find_all("h2")
@@ -44,39 +45,23 @@ def get_initials_of_chapters():
             fnt.extract()
         # remove all paragraphs which just have I. or II. in them (subchapter headers)
         for p in content[0].find_all("p"):
-            if p.text in ["I.", "II.", "III."]:
-                p.extract()
-        txt = content[0].text[0:100].strip().upper()
-        txt = re.sub(r"[^A-Z]", "", txt)
-        ci.append(txt[0])
-        print(ch.text[:20] + "...", "->", txt[:20], "->", txt[0])
-    print()
-    return ci
+            for rn in ["I.", "II.", "III.", " – Reb Wiki"]:
+                if p.text.startswith(rn):
+                    p.extract()
+                    break
+        citxt = content[0].text[0:100].strip().upper()
+        citxt = re.sub(r"[^A-Z]", "", citxt)
+        ci.append(citxt[0])
+        print(ch.text[:20] + "...", "->", citxt[:20], "->", citxt[0])
 
-def get_initials_of_book():
-    bi = []
-    soup = load_soup()
-    chapter_headings = soup.find_all("h2")
-    for ch in chapter_headings:
-        if "Chapter" not in ch.text: continue
-        content = ch.parent.find_all("div", "pjgm-postcontent")
-        if not content:
-            continue
-        # remove all blockquotes, which begin chapters
-        for bq in content[0].find_all("blockquote"):
-            bq.extract()
-        # remove all font tags (this is a bit of a bodge, but it removes the dates at the start)
-        for fnt in content[0].find_all("font"):
-            fnt.extract()
-
-        # now, get all text
-
-        txt = " ".join([c.text.strip() for c in content])
-        txt = txt.replace("\n", " ").replace("…", " ")
-        txt = re.sub(r"[^A-Za-z'’ ]", "", txt)
-        initials = [(x[0].upper(), x, ch.text) for x in txt.split()]
+        bitxt = " ".join([c.text.strip() for c in content])
+        bitxt = bitxt.replace("\n", " ").replace("…", " ")
+        bitxt = re.sub(r"[^A-Za-z'’ ]", "", bitxt)
+        initials = [(x[0].upper(), x, ch.text) for x in bitxt.split()]
         bi += initials
-    return bi
+
+    print()
+    return (ci, bi)
 
 def find_lcs(ci, bi):
     print("Longest common subsequences...")
@@ -99,6 +84,5 @@ def find_lcs(ci, bi):
         print()
 
 if __name__ == "__main__":
-    chapter_initials = get_initials_of_chapters()
-    book_initials = get_initials_of_book()
+    chapter_initials, book_initials = get_initials()
     find_lcs(chapter_initials, book_initials)
