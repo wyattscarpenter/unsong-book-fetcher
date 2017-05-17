@@ -21,12 +21,11 @@ header = """<!doctype html>
 <body>
 """
 footer = """<hr><article>
-<p>Complete up to the date of creation of this ebook, which was <date>%s</date>.</p>
 <p>Made from <a href="http://unsongbook.com/">the Unsong book website</a> by
 the <a href="https://github.com/stuartlangridge/unsong-book-fetcher">Unsong fetcher script</a> 
 by <a href="https://kryogenix.org">Stuart Langridge</a>.</p>
 </article>
-</body></html>""" % (datetime.datetime.now(),)
+</body></html>"""
 
 def create_book():
     # create cover
@@ -78,6 +77,10 @@ def create_book():
         elif "Chapter 19" in c:
             nchapters.append(c18)
         nchapters.append(c)
+
+    # Strip out a few artifacts which shouldn't be in a final book.
+    #print([(x, nchapters[x][60:120]) for x in range(len(nchapters))])
+    nchapters[98] = nchapters[98].replace("An epilogue will be published on Wednesday.", "")
 
     fp = open("Unsong.html", encoding="utf-8", mode="w")
     fp.write(header)
