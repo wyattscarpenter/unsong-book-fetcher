@@ -192,10 +192,8 @@ def get_url(url):
     for img in content.find_all("img"):
         img_url = img["src"]
         img_data = fetch_or_get(img_url, binary=True)
-        magic_identifier = magic.open(magic.MIME)
-        magic_identifier.load()
-        img_type = magic_identifier.buffer(img_data)
-        magic_identifier.close()
+        magic_identifier = magic.Magic(mime=True)
+        img_type = magic_identifier.from_buffer(img_data)
         img_type = img_type.split(";")[0]
 
         img["src"] = "data:%s;base64,%s" % (img_type, base64.encodestring(img_data).decode("utf-8"))
