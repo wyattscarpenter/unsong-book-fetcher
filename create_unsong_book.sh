@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p cache
+
 echo Fetching book
 python3 get_unsong.py $*
 
