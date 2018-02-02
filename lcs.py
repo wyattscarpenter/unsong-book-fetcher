@@ -19,7 +19,7 @@ import re
 import difflib
 
 def load_soup():
-    fp = open("Unsong.html")
+    fp = open("Unsong.html", encoding='utf8')
     data = fp.read()
     fp.close()
     soup = BeautifulSoup(data, "lxml")
