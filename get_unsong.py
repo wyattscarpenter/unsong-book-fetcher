@@ -6,7 +6,6 @@ import os
 import json
 import datetime
 import base64
-import magic
 import io
 from PIL import Image, ImageDraw, ImageFont
 
@@ -20,15 +19,12 @@ header = """<!doctype html>
 </head>
 <body>
 """
-footer = """<hr><article>
-<p>Made from <a href="http://unsongbook.com/">the Unsong book website</a> by
-the <a href="https://github.com/stuartlangridge/unsong-book-fetcher">Unsong fetcher script</a> 
-by <a href="https://kryogenix.org">Stuart Langridge</a>.</p>
-</article>
-</body></html>"""
+footer = """</body></html>"""
+INCLUDE_AUTHOR_NOTES = True #True, False, or "appendix"
+INCLUDE_AUTOGEN_COVER = False
 
-def create_book():
-    # create cover
+def make_cover():
+    global cover_src
     title_img_data = fetch_or_get("http://i.imgur.com/d9LvKMc.png", binary=True)
     bio = io.BytesIO(title_img_data)
     title_img = Image.open(bio)
@@ -66,11 +62,14 @@ def create_book():
     cover_img.save(bio, "PNG")
     cover_src = "data:image/png;base64,%s" % (base64.encodestring(bio.getvalue()).decode("utf-8"))
 
+def create_book():
     # Special handling for chapter 18, which should be in book II but Alexander has done the
-    # navigation links wrongly,so we manually insert it before c19
+    # navigation links wrong, so we manually insert it before c19
     nchapters = []
     c18 = None
+    
     for c in CHAPTERS:
+        c.replace("An epilogue will be published on Wednesday.", "")
         if "Chapter 18:" in c:
             c18 = c
             continue
@@ -78,20 +77,23 @@ def create_book():
             nchapters.append(c18)
         nchapters.append(c)
 
-    # Strip out a few artifacts which shouldn't be in a final book.
-    #print([(x, nchapters[x][60:120]) for x in range(len(nchapters))])
-    nchapters[98] = nchapters[98].replace("An epilogue will be published on Wednesday.", "")
-
     fp = open("Unsong.html", encoding="utf-8", mode="w")
     fp.write(header)
-    fp.write("<header><img src='%s' alt=''><h1>Unsong</h1><h2>Scott Alexander</h2></header>" % cover_src)
+    fp.write("<header>")
+    if INCLUDE_AUTOGEN_COVER:
+        make_cover()
+        fp.write("<img src='%s' alt=''>" % cover_src )
+    #got rid of this line because I didn't like how it looked
+    #fp.write("<h1>Unsong</h1><h2>Scott Alexander</h2></header>")
+        
     fp.write("<main>")
     fp.write("\n\n\n".join(nchapters))
     fp.write("</main>")
-    fp.write("<section>")
-    fp.write("<h1>Appendix: Author Notes</h1>")
-    fp.write("\n\n\n".join(AUTHOR_NOTES))
-    fp.write("</section>")
+    if INCLUDE_AUTHOR_NOTES == "appendix":
+        fp.write("<section>")
+        fp.write("<h1>Appendix: Author Notes</h1>")
+        fp.write("\n\n\n".join(AUTHOR_NOTES))
+        fp.write("</section>")
     fp.write(footer)
     fp.close()
 
@@ -170,8 +172,10 @@ def get_url(url):
     heading = post[0].find_all("h1", "pjgm-posttitle")[0]
     if heading.text.lower().startswith("book"):
         details["type"] = "book"
-    elif heading.text.lower().startswith("author"):
+    elif heading.text.lower().startswith(("author","postscript")):
         details["type"] = "author note"
+    elif heading.text.lower().startswith(("prologue","epilogue")):
+        details["type"] = "logue"
     else:
         details["type"] = "chapter"
     if details["type"] == "book":
@@ -187,14 +191,24 @@ def get_url(url):
     if nexts: next = nexts[0].attrs["href"]
     share = soup.find_all("div", "sharedaddy")
     [s.extract() for s in share]
-
+    
     # cache images
     for img in content.find_all("img"):
         img_url = img["src"]
+        if "5qMRb0F" in img_url:
+            #I did not like the old Book I image. It was too tall.
+            #So here I replace it with an edited version.
+            img_url = "https://i.imgur.com/6LYXDVi.png"
         img_data = fetch_or_get(img_url, binary=True)
-        magic_identifier = magic.Magic(mime=True)
-        img_type = magic_identifier.from_buffer(img_data)
-        img_type = img_type.split(";")[0]
+        #REMARK FROM THE IDIOT WHO EDITED THIS:
+        # the following lines do somehting useful but not crucial
+        # and they depended on a dependancy that was
+        # broken on my system, so I modified them
+        # to just be vague about image type.
+        # I think this is technically valid, though.
+        #magic_identifier = magic.Magic(mime=True)
+        #img_type = magic_identifier.from_buffer(img_data)
+        img_type = "image/*" #img_type.split(";")[0]
 
         img["src"] = "data:%s;base64,%s" % (img_type, base64.encodestring(img_data).decode("utf-8"))
 
@@ -210,7 +224,10 @@ def get_next(next):
     last_fetched = next
     previous, html, details, next = get_url(next)
     if details["type"] == "author note":
-        AUTHOR_NOTES.append(html)
+        if INCLUDE_AUTHOR_NOTES == "appendix":
+           AUTHOR_NOTES.append(html)
+        elif INCLUDE_AUTHOR_NOTES:
+            CHAPTERS.append(html)
     else:
         CHAPTERS.append(html)
     if next:
