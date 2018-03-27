@@ -1,6 +1,6 @@
-# Unsong book fetcher
+# Manly Unsong Book Fetcher
 
-Grabs the text of the book *Unsong* by Scott Alexander from [unsongbook.com](http://unsongbook.com) and makes an extremely manly 320-page PDF out of it. This is notable as most copies of *Unsong* are around 700 pages, and do not even include the author's notes.
+Grabs the text of the book *Unsong* by Scott Alexander from [unsongbook.com](http://unsongbook.com) and makes an extremely manly 300-page PDF out of it. This is notable as most copies of *Unsong* are around 700 pages, and do not even include the author's notes.
 
 Requires Python 3 and PIL. Uses a folder `cache` which caches the downloaded text and images so it can be re-run again later and be a lot quicker. Requires Calibre's `ebook-convert` to actually do the conversion to pdf.
 
