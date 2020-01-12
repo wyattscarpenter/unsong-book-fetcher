@@ -195,7 +195,7 @@ def get_url(url):
             #So here I replace it with an edited version.
             img_url = "https://i.imgur.com/6LYXDVi.png"
         img_data = fetch_or_get(img_url, binary=True)
-        img_type = "image" #vague to avoid having to detect image type.
+        img_type = "image/" #vague to avoid having to detect image type.
         img["src"] = "data:%s;base64,%s" % (img_type, base64.encodestring(img_data).decode("utf-8"))
 
     html = '<article class="%s">\n%s\n%s\n</article>\n' % (details["type"], heading, content)
