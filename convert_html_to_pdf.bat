@@ -1,4 +1,0 @@
-#! /bin/bash
-# this is both a cmd script and a bash script probably
-ebook-convert Unsong.html Unsong.pdf --remove-paragraph-spacing --level1-toc="//*[((name()='h1' or name()='h2') and re:test(., 'book\s+|prologue|epilogue', 'i'))"] --level2-toc="//*[((name()='h1' or name()='h2') and re:test(., 'chapter|interlude|author|postscript', 'i'))"] --pdf-default-font-size 13 --authors "Scott Alexander" --language en --chapter / --search-replace replacements.txt --pdf-page-margin-left 45 --pdf-page-margin-right 45 --pdf-page-margin-top 30 --pdf-page-margin-bottom 44 --change-justification justify --pdf-footer-template "<br><center>_PAGENUM_</center>"
---pdf-add-toc

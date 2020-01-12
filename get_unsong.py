@@ -21,10 +21,9 @@ header = """<!doctype html>
 """
 footer = """</body></html>"""
 INCLUDE_AUTHOR_NOTES = True #True, False, or "appendix"
-INCLUDE_AUTOGEN_COVER = False
+INCLUDE_AUTOGEN_COVER = True
 
 def make_cover():
-    global cover_src
     title_img_data = fetch_or_get("http://i.imgur.com/d9LvKMc.png", binary=True)
     bio = io.BytesIO(title_img_data)
     title_img = Image.open(bio)
@@ -60,16 +59,15 @@ def make_cover():
 
     bio = io.BytesIO()
     cover_img.save(bio, "PNG")
-    cover_src = "data:image/png;base64,%s" % (base64.encodestring(bio.getvalue()).decode("utf-8"))
+    return "data:image/png;base64,%s" % (base64.encodestring(bio.getvalue()).decode("utf-8"))
 
 def create_book():
-    # Special handling for chapter 18, which should be in book II but Alexander has done the
-    # navigation links wrong, so we manually insert it before c19
     nchapters = []
     c18 = None
-    
+
     for c in CHAPTERS:
-        c.replace("An epilogue will be published on Wednesday.", "")
+        # Special handling for chapter 18, which should be in book II but Alexander has done the
+        # navigation links wrong, so we manually insert it before c19
         if "Chapter 18:" in c:
             c18 = c
             continue
@@ -81,10 +79,7 @@ def create_book():
     fp.write(header)
     fp.write("<header>")
     if INCLUDE_AUTOGEN_COVER:
-        make_cover()
-        fp.write("<img src='%s' alt=''>" % cover_src )
-    #got rid of this line because I didn't like how it looked
-    #fp.write("<h1>Unsong</h1><h2>Scott Alexander</h2></header>")
+        fp.write("<img src='%s' alt=''>" % make_cover())
         
     fp.write("<main>")
     fp.write("\n\n\n".join(nchapters))
@@ -166,7 +161,7 @@ def get_url(url):
     if cached_parsed:
         return cached_parsed
     details = {}
-    soup = BeautifulSoup(data, "lxml")
+    soup = BeautifulSoup(data, "html.parser")
     post = soup.find_all("div", "post")
     nav = soup.find_all("div", "pjgm-navigation")
     heading = post[0].find_all("h1", "pjgm-posttitle")[0]
@@ -178,7 +173,7 @@ def get_url(url):
         details["type"] = "logue"
     else:
         details["type"] = "chapter"
-    if details["type"] == "book":
+    if details["type"] in ("book", "logue"):
         heading.name = "h1"
     else:
         heading.name = "h2"
@@ -191,7 +186,7 @@ def get_url(url):
     if nexts: next = nexts[0].attrs["href"]
     share = soup.find_all("div", "sharedaddy")
     [s.extract() for s in share]
-    
+
     # cache images
     for img in content.find_all("img"):
         img_url = img["src"]
@@ -200,16 +195,7 @@ def get_url(url):
             #So here I replace it with an edited version.
             img_url = "https://i.imgur.com/6LYXDVi.png"
         img_data = fetch_or_get(img_url, binary=True)
-        #REMARK FROM THE IDIOT WHO EDITED THIS:
-        # the following lines do somehting useful but not crucial
-        # and they depended on a dependancy that was
-        # broken on my system, so I modified them
-        # to just be vague about image type.
-        # I think this is technically valid, though.
-        #magic_identifier = magic.Magic(mime=True)
-        #img_type = magic_identifier.from_buffer(img_data)
-        img_type = "image/*" #img_type.split(";")[0]
-
+        img_type = "image" #vague to avoid having to detect image type.
         img["src"] = "data:%s;base64,%s" % (img_type, base64.encodestring(img_data).decode("utf-8"))
 
     html = '<article class="%s">\n%s\n%s\n</article>\n' % (details["type"], heading, content)
@@ -245,7 +231,6 @@ def get_next(next):
             else:
                 print("Whole book retrieved from cache.")
                 print("To force an update (to pull in more recent chapters), pass --force parameter.")
-        create_book()
 
 FORCE = False
 ALL_CACHED = True
@@ -254,3 +239,4 @@ if __name__ == "__main__":
     if "--force" in sys.argv:
         FORCE = True
     get_next("http://unsongbook.com/prologue-2/")
+    create_book()
