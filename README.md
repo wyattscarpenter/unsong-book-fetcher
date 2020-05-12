@@ -1,4 +1,6 @@
-# Unsong book fetcher
+**NOTE: this is an old version. For an updated version, with a bunch of useful changes, you want to be looking at [wyattscarpenter/unsong-book-fetcher](https://github.com/wyattscarpenter/unsong-book-fetcher) instead!**
+
+### Unsong book fetcher
 
 Grabs the text of the book UNSONG by Scott Alexander from [unsongbook.com](http://unsongbook.com) and makes an epub out of it.
 
