@@ -79,7 +79,8 @@ def create_book():
     fp.write(header)
     fp.write("<header>")
     if INCLUDE_AUTOGEN_COVER:
-        fp.write("<img src='%s' alt=''>" % make_cover())
+        fp.write("<h1>Cover</h1>")
+        fp.write("<img src='%s' alt='Unsong by Scott Alexander'>" % make_cover())
         
     fp.write("<main>")
     fp.write("\n\n\n".join(nchapters))
