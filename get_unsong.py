@@ -80,7 +80,7 @@ def create_book():
     fp.write("<header>")
     if INCLUDE_AUTOGEN_COVER:
         fp.write("<img src='%s' alt=''>" % make_cover())
-        
+    fp.write("</header>")
     fp.write("<main>")
     fp.write("\n\n\n".join(nchapters))
     fp.write("</main>")
@@ -211,7 +211,7 @@ def get_next(next):
     previous, html, details, next = get_url(next)
     if details["type"] == "author note":
         if INCLUDE_AUTHOR_NOTES == "appendix":
-           AUTHOR_NOTES.append(html)
+            AUTHOR_NOTES.append(html)
         elif INCLUDE_AUTHOR_NOTES:
             CHAPTERS.append(html)
     else:
