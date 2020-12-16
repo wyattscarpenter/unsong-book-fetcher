@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 CHAPTERS = []
 AUTHOR_NOTES = []
+TOSEFTA = []
 header = """<!doctype html>
 <html>
 <head>
@@ -22,6 +23,7 @@ header = """<!doctype html>
 footer = """</body></html>"""
 INCLUDE_AUTHOR_NOTES = True #True, False, or "appendix"
 INCLUDE_AUTOGEN_COVER = True
+INCLUDE_TOSEFTA = True
 
 def make_cover():
     title_img_data = fetch_or_get("http://i.imgur.com/d9LvKMc.png", binary=True)
@@ -81,7 +83,7 @@ def create_book():
     if INCLUDE_AUTOGEN_COVER:
         fp.write("<h1>Cover</h1>")
         fp.write("<img src='%s' alt='Unsong by Scott Alexander'>" % make_cover())
-        
+    fp.write("</header>")
     fp.write("<main>")
     fp.write("\n\n\n".join(nchapters))
     fp.write("</main>")
@@ -89,6 +91,10 @@ def create_book():
         fp.write("<section>")
         fp.write("<h1>Appendix: Author Notes</h1>")
         fp.write("\n\n\n".join(AUTHOR_NOTES))
+        fp.write("</section>")
+    if INCLUDE_TOSEFTA:
+        fp.write("<section>")
+        fp.write("\n\n\n".join(TOSEFTA))
         fp.write("</section>")
     fp.write(footer)
     fp.close()
@@ -163,7 +169,7 @@ def get_url(url):
         return cached_parsed
     details = {}
     soup = BeautifulSoup(data, "html.parser")
-    post = soup.find_all("div", "post")
+    post = soup.find_all("div", ["post", "page"])
     nav = soup.find_all("div", "pjgm-navigation")
     heading = post[0].find_all("h1", "pjgm-posttitle")[0]
     if heading.text.lower().startswith("book"):
@@ -172,19 +178,22 @@ def get_url(url):
         details["type"] = "author note"
     elif heading.text.lower().startswith(("prologue","epilogue")):
         details["type"] = "logue"
+    elif heading.text.lower().startswith("tosefta"):
+        details["type"] = "tosefta"
     else:
         details["type"] = "chapter"
-    if details["type"] in ("book", "logue"):
+    if details["type"] in ("book", "logue", "tosefta"):
         heading.name = "h1"
     else:
         heading.name = "h2"
     content = post[0].find_all("div", "pjgm-postcontent")[0]
     prev = None
     next = None
-    prevs = nav[0].find_all("a", {"rel": "prev"})
-    if prevs: prev = prevs[0].attrs["href"]
-    nexts = nav[0].find_all("a", {"rel": "next"})
-    if nexts: next = nexts[0].attrs["href"]
+    if nav:
+        prevs = nav[0].find_all("a", {"rel": "prev"})
+        if prevs: prev = prevs[0].attrs["href"]
+        nexts = nav[0].find_all("a", {"rel": "next"})
+        if nexts: next = nexts[0].attrs["href"]
     share = soup.find_all("div", "sharedaddy")
     [s.extract() for s in share]
 
@@ -212,9 +221,11 @@ def get_next(next):
     previous, html, details, next = get_url(next)
     if details["type"] == "author note":
         if INCLUDE_AUTHOR_NOTES == "appendix":
-           AUTHOR_NOTES.append(html)
+            AUTHOR_NOTES.append(html)
         elif INCLUDE_AUTHOR_NOTES:
             CHAPTERS.append(html)
+    elif details["type"] == "tosefta":
+        TOSEFTA.append(html)
     else:
         CHAPTERS.append(html)
     if next:
@@ -240,4 +251,6 @@ if __name__ == "__main__":
     if "--force" in sys.argv:
         FORCE = True
     get_next("http://unsongbook.com/prologue-2/")
+    get_next("http://unsongbook.com/tosefta/")
+
     create_book()

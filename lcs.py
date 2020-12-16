@@ -10,8 +10,8 @@ https://www.reddit.com/r/unsong/comments/69k1im/preemptive_final_exam_suggestion
 This script calculates those substrings. The answers are not all that promising.
 
 It requires a file, Unsong.html, which is the text of the book with fairly plain
-formatting. This file is created by my epub builder for Unsong, which lives at
-https://github.com/stuartlangridge/unsong-book-fetcher.
+formatting. This file is created by Unsong Book Fetcher, which lives at
+https://github.com/wyattscarpenter/unsong-book-fetcher.
 """
 
 from bs4 import BeautifulSoup
