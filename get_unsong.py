@@ -5,9 +5,13 @@ import re
 import os
 import json
 import datetime
-import base64
 import io
 from PIL import Image, ImageDraw, ImageFont
+
+try:
+    from base64 import encodebytes
+except ImportError:
+    from base64 import encodestring as encodebytes
 
 CHAPTERS = []
 AUTHOR_NOTES = []
@@ -61,7 +65,7 @@ def make_cover():
 
     bio = io.BytesIO()
     cover_img.save(bio, "PNG")
-    return "data:image/png;base64,%s" % (base64.encodestring(bio.getvalue()).decode("utf-8"))
+    return "data:image/png;base64,%s" % (encodebytes(bio.getvalue()).decode("utf-8"))
 
 def create_book():
     nchapters = []
@@ -206,7 +210,7 @@ def get_url(url):
             img_url = "https://i.imgur.com/6LYXDVi.png"
         img_data = fetch_or_get(img_url, binary=True)
         img_type = "image/" #vague to avoid having to detect image type.
-        img["src"] = "data:%s;base64,%s" % (img_type, base64.encodestring(img_data).decode("utf-8"))
+        img["src"] = "data:%s;base64,%s" % (img_type, encodebytes(img_data).decode("utf-8"))
 
     html = '<article class="%s">\n%s\n%s\n</article>\n' % (details["type"], heading, content)
     output = (prev, html, details, next)
