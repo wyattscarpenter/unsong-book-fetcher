@@ -9,6 +9,7 @@ This is the foreword to the book, which is written by Wyatt S Carpenter. This fo
 There are two **important pieces of advice** this foreword can offer you:
 
 - After finishing the Epilogue, you have finished _Unsong_. I recommend you do **not** read the Tosefta immediately. The Tosefta is a sort of director's commentary on the novel, and so is best enjoyed (in my opinion) after you have mulled over the novel for a while by yourself. Wait possibly a week? Whenever you feel like it's time to crack into it is probably a fine time to return and read the Tosefta.
+  - (There are slight spoilers in this bullet point.) The Tosefta was written as a reward for the community figuring out the explicit name of God, so you might wish to try figuring that out first, as a fun challenge.
 
 - Don't read "Interlude י: The Broadcast"§II. Skip directly to §III.
   - Don't worry too much about remembering this, as you will be reminded; the chapter in question has a "Content warning: Part II of this chapter contains..." note at the beginning; it is the first "Content warning" note in the book, and is also several sentences long (by the way: I personally recommend not reading those sentences, either; I would say stop reading the content warning after that bit I just quoted).
