@@ -29,9 +29,7 @@ INCLUDE_AUTOGEN_COVER = True
 INCLUDE_TOSEFTA = True
 
 def make_cover():
-    title_img_data = fetch_or_get("http://i.imgur.com/d9LvKMc.png", binary=True) #this is the header image hotlinked on unsongbook.com
-    bio = io.BytesIO(title_img_data)
-    title_img = Image.open(bio)
+    title_img = Image.open("assets/unsong_header.png") #this is the header image hotlinked on unsongbook.com as of 2024-11-16
     tw, th = title_img.size
     cw = int(tw * 1.5)
     ch = int(cw * 1.6)
@@ -214,9 +212,10 @@ def get_url(url):
     for img in content.find_all("img"):
         img_url = img["src"]
         if "5qMRb0F" in img_url:
-            #I did not like the old Book I image. It was too tall. So here I replace it with an edited version Wyatt S Carpenter made.
-            img_url = "https://i.imgur.com/6LYXDVi.png"
-        img_data = fetch_or_get(img_url, binary=True)
+            #Special handling: I did not like the old Book I image. It was too tall. So here I replace it with an edited version Wyatt S Carpenter made.
+            img_data = open("assets/unsong book i fixed.png", "rb").read()
+        else:
+            img_data = fetch_or_get(img_url, binary=True)
         img_type = "image/" #vague to avoid having to detect specific image type.
         img["src"] = "data:%s;base64,%s" % (img_type, encodebytes(img_data).decode("utf-8"))
 
