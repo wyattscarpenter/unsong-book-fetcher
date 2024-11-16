@@ -84,7 +84,7 @@ def create_book():
             nchapters.append(c18)
         nchapters.append(c)
 
-    os.mkdir("ebooks/")
+    os.makedirs("ebooks/", exist_ok=True)
     fp = open("ebooks/Unsong.html", encoding="utf-8", mode="w")
     fp.write(header)
     fp.write("<header>")
