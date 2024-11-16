@@ -25,12 +25,12 @@ header = """<!doctype html>
 <body>
 """
 footer = """</body></html>"""
-INCLUDE_AUTHOR_NOTES = True #True, False, or "appendix"
+INCLUDE_AUTHOR_NOTES = True #True to leave them in, False to exclude them, or "appendix" to put them all at the end.
 INCLUDE_AUTOGEN_COVER = True
 INCLUDE_TOSEFTA = True
 
 def make_cover():
-    title_img_data = fetch_or_get("http://i.imgur.com/d9LvKMc.png", binary=True)
+    title_img_data = fetch_or_get("http://i.imgur.com/d9LvKMc.png", binary=True) #this is the header image hotlinked on unsongbook.com
     bio = io.BytesIO(title_img_data)
     title_img = Image.open(bio)
     tw, th = title_img.size
@@ -72,8 +72,7 @@ def create_book():
     c18 = None
 
     for c in CHAPTERS:
-        # Special handling for chapter 18, which should be in book II but Alexander has done the
-        # navigation links wrong, so we manually insert it before c19
+        # Special handling for chapter 18, which should be in book II but Alexander has done the navigation links wrong, so we manually insert it before c19.
         if "Chapter 18:" in c:
             c18 = c
             continue
@@ -205,11 +204,10 @@ def get_url(url):
     for img in content.find_all("img"):
         img_url = img["src"]
         if "5qMRb0F" in img_url:
-            #I did not like the old Book I image. It was too tall.
-            #So here I replace it with an edited version.
+            #I did not like the old Book I image. It was too tall. So here I replace it with an edited version Wyatt S Carpenter made.
             img_url = "https://i.imgur.com/6LYXDVi.png"
         img_data = fetch_or_get(img_url, binary=True)
-        img_type = "image/" #vague to avoid having to detect image type.
+        img_type = "image/" #vague to avoid having to detect specific image type.
         img["src"] = "data:%s;base64,%s" % (img_type, encodebytes(img_data).decode("utf-8"))
 
     html = '<article class="%s">\n%s\n%s\n</article>\n' % (details["type"], heading, content)
