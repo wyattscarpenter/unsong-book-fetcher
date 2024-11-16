@@ -84,7 +84,8 @@ def create_book():
             nchapters.append(c18)
         nchapters.append(c)
 
-    fp = open("Unsong.html", encoding="utf-8", mode="w")
+    os.mkdir("ebooks/")
+    fp = open("ebooks/Unsong.html", encoding="utf-8", mode="w")
     fp.write(header)
     fp.write("<header>")
     if INCLUDE_AUTOGEN_COVER:

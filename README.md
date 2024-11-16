@@ -24,7 +24,7 @@ All you have to do once everything is installed is run `create_unsong_book.bat`.
 
 ## Testing
 
-test_ebook_hash.py tests get_unsong.py for regressions, as best it can. It does this using file hashing.
+test_ebook_hash.py tests get_unsong.py for regressions, as best it can. It does this using file hashing. TODO: this test code is pretty good right now, but I'm making a lot of changes to the epub so the hardcoded file hashes may be much out of date.
 
 ## lcs.py
 
