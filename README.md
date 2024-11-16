@@ -18,13 +18,13 @@ The pre-made ebooks are in the ebooks folder. However, you may perhaps wish to r
 
 (If you know what a package manager is, and you have one, you can try using that for the "install" steps, instead.)
 
-I'm not sure what the earliest calibre version that will work is — I've been able to do html to epub using 4.11, but to get epub to html (I only use this for testing purposes), I had to upgrade, in my case to 7.21.0. Regardless, whatever calibre you get will *probably* be fine. It would be nice if we could just install calibre from pypi — it's even written mostly in python! But it's not on there, apparently. If I had infinite time on this finite earth I would bug the calibre person(s) to get it on there, I think.
+I'm not sure what the earliest calibre version that will work is — 4.11 and 7.21.0 both worked for my purposes. Regardless, whatever calibre you get will *probably* be fine. It would be nice if we could just install calibre from pypi — it's even written mostly in python! But it's not on there, apparently. If I had infinite time on this finite earth I would bug the calibre person(s) to get it on there, I think.
 
 All you have to do once everything is installed is run `create_unsong_book.bat`. This script has been cleverly engineered to be both a valid Windows batch file and POSIX shell file. This script installs python requirements with `pip install -r requirements.txt`, fetches the text and creates an HTML ebook with `get_unsong.py` (which will output `Unsong.html`), and converts the HTML to an epub with `ebook-convert` (which will output `Unsong.epub`).
 
 ## Testing
 
-test_suite.bat (also both a valid shell script and bat script) tests get_unsong.py for regressions, as best it can. It does this using test_ebook_hash.py.
+test_ebook_hash.py tests get_unsong.py for regressions, as best it can. It does this using file hashing.
 
 ## lcs.py
 
