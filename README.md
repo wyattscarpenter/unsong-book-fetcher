@@ -1,15 +1,31 @@
 # Unsong Book Fetcher
 
-Grabs the text of the book *Unsong* by Scott Alexander from [unsongbook.com](http://unsongbook.com) and makes an epub out of it.
+## Executive summary
 
-Requires Python 3 and PIL. Uses a folder `cache` which caches the downloaded text and images so it can be re-run again later and be a lot quicker. Requires Calibre's `ebook-convert` to actually do the conversion to epub.
+This software project grabs the text of the book *Unsong* by Scott Alexander from [unsongbook.com](http://unsongbook.com) and makes an epub out of it.
 
-All you have to do is run `create_unsong_book.bat`.
-This script has been cleverly engineered to be both a valid Windows batch file and POSIX shell file.
-This script will install python requirements with `pip install -r requirements.txt`,
-fetch the text and create an HTML ebook with `get_unsong.py`, which will output `Unsong.html`,
-and convert the HTML to an epub with `ebook-convert`, which will output `Unsong.epub`.
+If you would like one of these ebooks, please check out the files in the ebooks folder.
 
-## TODO:
+Please note that in order to get the finalized, revised version of Unsong — and to financially support its author — you must purchase the ebook (or regular book) from <https://www.amazon.com/Unsong-Scott-Alexander-ebook/dp/B0D84DLKZW> (or <https://www.amazon.com/Unsong-Scott-Alexander/dp/B0D57BYS3Y> for the paperback); the ebooks here are the story as it is presented on the freely-available <http://unsongbook.com>.
 
-Write the foreword from the compiler. (among other things) discuss the lineage of this project (steal from my releases page summaries?), discuss how this is Version 1 as opposed to Amazon's Version 2 (sub-version-1 changes can be found tracked in https://github.com/florolf/unsong-scrape), also give a shout out to [unsong-scraper](https://github.com/JasonGross/unsong_scraper) which is a lot like this project but in ruby, also https://github.com/darioml/unsong-scraper-node seems a lot like the same but in javascript. Uhhh make a cover image in yellow and a title page in white. Possibly add this readme as a foreword? possibly talk about the v1–v2 changes in some detail, possibly doing a diff on my end if i can get the files (although I will not share the per se files or diff, for obvious reasons).
+## Running the software, per se
+
+The pre-made ebooks are in the ebooks folder. However, you may perhaps wish to run this software project yourself and thereby create the ebooks (someone must have done this at some point!) To use this project in that way:
+- download this project if you don't already have it. The easiest way to do this is probably clicking the green "< > Code" above the file listing of this project on github, and then click "Download ZIP", and then once the zip file is downloaded, extract it and put the resulting folder somewhere convenient.
+- install, or already have installed, Python 3. You can try running python on the command line to see if you have it, or just download it from https://www.python.org/downloads/
+- install, or already have installed, Calibre, which you can download from here: <https://calibre-ebook.com/download>
+- run `create_unsong_book.bat`.
+
+(If you know what a package manager is, and you have one, you can try using that for the "install" steps, instead.)
+
+I'm not sure what the earliest calibre version that will work is — I've been able to do html to epub using 4.11, but to get epub to html (I only use this for testing purposes), I had to upgrade, in my case to 7.21.0. Regardless, whatever calibre you get will *probably* be fine. It would be nice if we could just install calibre from pypi — it's even written mostly in python! But it's not on there, apparently. If I had infinite time on this finite earth I would bug the calibre person(s) to get it on there, I think.
+
+All you have to do once everything is installed is run `create_unsong_book.bat`. This script has been cleverly engineered to be both a valid Windows batch file and POSIX shell file. This script installs python requirements with `pip install -r requirements.txt`, fetches the text and creates an HTML ebook with `get_unsong.py` (which will output `Unsong.html`), and converts the HTML to an epub with `ebook-convert` (which will output `Unsong.epub`).
+
+## Testing
+
+test_suite.bat (also both a valid shell script and bat script) tests get_unsong.py for regressions, as best it can. It does this using test_ebook_hash.py.
+
+## lcs.py
+
+This file discovers the name of God. It is thus a spoiler for _Unsong_.
