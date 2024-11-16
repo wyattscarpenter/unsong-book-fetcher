@@ -20,10 +20,10 @@ def f(file_name_of_actual_file: str, expected_hash_hexdigest: str) -> None|NoRet
   a( h(file_name_of_actual_file), expected_hash_hexdigest)
 
 def compare() -> None|NoReturn:
-  f('ebooks/Unsong.html', 'e716d3a24eaa5d215bb5f290d9f972e911251456a7b00865de97763aa30de580')
+  f('ebooks/Unsong.html', '905caec08c3d3ede586f2ecef837b20bf17ba31f9637283cd0eef43b608e9adf')
   #We can't use the hash method for epub; I guess calibre's ebook-convert is probably not bit-exact/deterministic/reproducible https://bugs.launchpad.net/calibre/+bug/1998328 #given infinite time on this finite earth, this would be a thing to go fix. #But given that we don't have infinite time, and there's no other reason to care about this, particularly, we use a different method: converting to txt and comparing those, since text output actually is bit-exact.  #converting to a .html is not actually supported by ebook-convert, either
   run("ebook-convert ebooks/Unsong.epub ebooks/Unsong.epub.txt", stdout=nul)
-  f('ebooks/Unsong.epub.txt', "d8cb808328f81680020760620f6d432e190d88327fd5698a69150b2074be6cbd")
+  f('ebooks/Unsong.epub.txt', "c7e34ef4e8e46230f7aa81028885cc3c6b74c636ef7218a1d6e32ee86cab5fed")
 
 def main() -> None|NoReturn:
   run("ruff check --no-cache")

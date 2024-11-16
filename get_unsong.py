@@ -254,7 +254,7 @@ def get_next(next):
                 get_next(last_fetched)
             else:
                 print("Whole book retrieved from cache.")
-                print("To force an update (to pull in more recent chapters), pass --force parameter.")
+                print("To force an update (to pull in more recent chapters), pass --force parameter. To completely clear the cache and force a total refetch, delete all of the files in the cache/ folder (except the .gitignore file). You may also just force reparsing by deleting the appropriate CACHED_PARSED files.")
 
 FORCE = False
 ALL_CACHED = True
