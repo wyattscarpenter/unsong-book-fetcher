@@ -32,7 +32,8 @@ def get_initials():
     chapter_headings = soup.find_all("h2")
     print("Extracting chapter initials...")
     for ch in chapter_headings:
-        if "Chapter" not in ch.text: continue
+        if "Chapter" not in ch.text:
+            continue
         content = ch.parent.find_all("div", "pjgm-postcontent")
         if not content:
             continue
@@ -71,7 +72,8 @@ def find_lcs(ci, bi):
     s = difflib.SequenceMatcher(None, bistr, cistr)
     for m in sorted(s.get_matching_blocks(), key=lambda a: a[2], reverse=True):
         bistart, cistart, length = m
-        if length < 3: continue
+        if length < 3:
+            continue
         cicombined = cistr[:cistart] + " >" + cistr[cistart:cistart+length] + "< " + cistr[cistart+length:]
         bisubstr = []
         for i in range(bistart, bistart+length):

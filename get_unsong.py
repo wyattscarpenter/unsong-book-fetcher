@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import re
 import os
 import json
-import datetime
 import io
 from PIL import Image, ImageDraw, ImageFont
 
@@ -42,7 +41,9 @@ def make_cover():
     height = cover_img.size[1]
     rs, gs, bs = gradient[0]
     re, ge, be = gradient[1]
-    rr = re - rs; gr = ge - gs; br = be - bs
+    rr = re - rs
+    gr = ge - gs
+    br = be - bs
     for i in range(height):
         r = rs + int(rr*i/height)
         g = gs + int(gr*i/height)
@@ -56,7 +57,7 @@ def make_cover():
     font = None
     try:
         font = ImageFont.truetype("/usr/share/texlive/texmf-dist/fonts/truetype/public/opensans/OpenSans-Light.ttf", size=24)
-    except:
+    except OSError: # This handles the font being unfindable, as it is on Windows, and also if it couldn't load for some other reason I guess.
         font = None
 
     txt = "Scott Alexander"
@@ -144,7 +145,8 @@ def fetch_or_get(url, binary=False):
 def get_cached_parsed(url):
     slug = "CACHED_PARSED_%s" % (slugify(url),)
     slug = "cache/%s" % slug
-    if not os.path.exists(slug): return
+    if not os.path.exists(slug):
+        return
     fp = open(slug, encoding="utf-8")
     data = json.load(fp)
     fp.close()
@@ -161,11 +163,13 @@ def remove_cache(url):
     # first remove the HTML cache
     slug = slugify(url)
     slug = "cache/%s" % slug
-    if os.path.exists(slug): os.unlink(slug)
+    if os.path.exists(slug):
+        os.unlink(slug)
     # next, remove the cached parsed
     slug = "CACHED_PARSED_%s" % (slugify(url),)
     slug = "cache/%s" % slug
-    if os.path.exists(slug): os.unlink(slug)
+    if os.path.exists(slug):
+        os.unlink(slug)
 
 def get_url(url):
     global ALL_CACHED
@@ -197,9 +201,11 @@ def get_url(url):
     next = None
     if nav:
         prevs = nav[0].find_all("a", {"rel": "prev"})
-        if prevs: prev = prevs[0].attrs["href"]
+        if prevs:
+            prev = prevs[0].attrs["href"]
         nexts = nav[0].find_all("a", {"rel": "next"})
-        if nexts: next = nexts[0].attrs["href"]
+        if nexts:
+            next = nexts[0].attrs["href"]
     share = soup.find_all("div", "sharedaddy")
     [s.extract() for s in share]
 
