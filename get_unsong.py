@@ -56,7 +56,7 @@ def make_cover():
         font = None
 
     txt = "Scott Alexander"
-    txtw, txth = draw.textsize(txt, font=font)
+    txtw = draw.textlength(txt, font=font)
     draw.text((int((cw - txtw) / 2), ch - 100), txt, fill=(0,0,0), font=font)
 
     bio = io.BytesIO()
