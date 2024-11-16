@@ -245,7 +245,7 @@ def get_next(next):
     else:
         if ALL_CACHED:
             if FORCE:
-                print("Forcing")
+                print("Forcing the program to go check on the last chapter to see if there are new updates...")
                 if details["type"] == "author note":
                     AUTHOR_NOTES= AUTHOR_NOTES[:-1]
                 else:
