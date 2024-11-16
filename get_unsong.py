@@ -121,6 +121,8 @@ def fetch_or_get(url, binary=False):
         #print("Got", url, "from cache")
     else:
         print("Fetching", url, "from web")
+        if url[:2] == "//":
+            url = "https:"+url
         req = urllib.request.Request(
             url, 
             data=None, 
@@ -178,9 +180,17 @@ def get_url(url):
         return cached_parsed
     details = {}
     soup = BeautifulSoup(data, "html.parser")
-    post = soup.find_all("div", ["post", "page"])
+    post = soup.find("div", ["post", "page"])
     nav = soup.find_all("div", "pjgm-navigation")
-    heading = post[0].find_all("h1", "pjgm-posttitle")[0]
+    try:
+        heading = post.find("h1", "pjgm-posttitle")
+        content = post.find("div", "pjgm-postcontent")
+    except AttributeError:
+        #we want to handle the nemorathwald appendix here without complicating the regular code
+        post = soup.find("div", "entry", recursive=True)
+        heading = post.find("h3", "entry-title", recursive=True)
+        heading = BeautifulSoup("<h1>Appendices</h1>", "html.parser") # Special handling: this is hard-coded here because, have to do it somehow.
+        content = post
     if heading.text.lower().startswith("book"):
         details["type"] = "book"
     elif heading.text.lower().startswith(("author","postscript")):
@@ -189,13 +199,14 @@ def get_url(url):
         details["type"] = "logue"
     elif heading.text.lower().startswith("tosefta"):
         details["type"] = "tosefta"
+    elif heading.text.lower().startswith("appendices"):
+        details["type"] = "appendices"
     else:
         details["type"] = "chapter"
-    if details["type"] in ("book", "logue", "tosefta"):
+    if details["type"] in ("book", "logue", "tosefta", "appendices"):
         heading.name = "h1"
     else:
         heading.name = "h2"
-    content = post[0].find_all("div", "pjgm-postcontent")[0]
     prev = None
     next = None
     if nav:
@@ -263,5 +274,6 @@ if __name__ == "__main__":
         FORCE = True
     get_next("http://unsongbook.com/prologue-2/")
     get_next("http://unsongbook.com/tosefta/")
+    get_next("https://nemorathwald.dreamwidth.org/404330.html")
 
     create_book()
