@@ -72,6 +72,9 @@ def create_book():
     c18 = None
 
     for c in CHAPTERS:
+        # Special handling for text replacement:
+        # Replace an ambiguous use of brackets not for telepathy or normal bracket stuff.
+        c = c.replace("[EVEN THOUGH THIS IS NOT FUNNY AT ALL]", "(EVEN THOUGH THIS IS NOT FUNNY AT ALL).")
         # Special handling for chapter 18, which should be in book II but Alexander has done the navigation links wrong, so we manually insert it before c19.
         if "Chapter 18:" in c:
             c18 = c
