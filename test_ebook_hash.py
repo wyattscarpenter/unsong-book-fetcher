@@ -12,16 +12,14 @@ def h(file_name: str) -> str:
     return s(P(file_name).read_bytes()).hexdigest()
 
 
-def a(x, y) -> None | NoReturn:
+def a(x, y) -> bool:
     print(x, "(actual)", "≟", y, "(expected)", x == y)
-    if not x == y:
-        print("Hash check failed! Do a diff of old-ebooks/ and ebooks/ , I guess...")
-        exit(17)
+    return x == y
 
 
-def f(file_name_of_actual_file: str, expected_hash_hexdigest: str) -> None | NoReturn:
+def f(file_name_of_actual_file: str, expected_hash_hexdigest: str) -> bool:
     print(file_name_of_actual_file)
-    a(h(file_name_of_actual_file), expected_hash_hexdigest)
+    return a(h(file_name_of_actual_file), expected_hash_hexdigest)
 
 
 def txtfy() -> None:
@@ -30,15 +28,17 @@ def txtfy() -> None:
 
 html_file_name = "ebooks/Unsong.html"
 txt_file_name = "ebooks/Unsong.epub.txt"
-html_hardcoded_hash = "ce9765b95538cca1a391203cf4f695d30ed2352c29d936d01aa455e44b8f332b"
+html_hardcoded_hash = "88eb57cc845fa4acdb4284efe0a614d8078e877125b27a1765e3ce2f9a86da42"
 txt_hardcoded_hash = "f8c60a976c12c2b7f2581936fe7d6bf4bb7b6d087337bf0a7f7224e51417c0cf"
 
 
 def compare() -> None | NoReturn:
-    f(html_file_name, html_hardcoded_hash)
     # We can't use the hash method for epub; I guess calibre's ebook-convert is probably not bit-exact/deterministic/reproducible https://bugs.launchpad.net/calibre/+bug/1998328 #given infinite time on this finite earth, this would be a thing to go fix. #But given that we don't have infinite time, and there's no other reason to care about this, particularly, we use a different method: converting to txt and comparing those, since text output actually is bit-exact.  #converting to a .html is not actually supported by ebook-convert, either
     txtfy()
-    f(txt_file_name, txt_hardcoded_hash)
+    results = [f(html_file_name, html_hardcoded_hash), f(txt_file_name, txt_hardcoded_hash)]
+    if not all(results):
+        print("Hash check failed! Do a diff of old-ebooks/ and ebooks/ , I guess...")
+        exit(17)
 
 
 def main() -> None | NoReturn:

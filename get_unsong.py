@@ -1,4 +1,3 @@
-import urllib.request
 import sys
 from bs4 import BeautifulSoup
 import re
@@ -6,6 +5,7 @@ import os
 import json
 import io
 from PIL import Image, ImageDraw, ImageFont
+import requests
 
 try:
     from base64 import encodebytes
@@ -123,16 +123,13 @@ def fetch_or_get(url, binary=False):
         print("Fetching", url, "from web")
         if url[:2] == "//":
             url = "https:"+url
-        req = urllib.request.Request(
-            url, 
-            data=None, 
+        req = requests.get(
+            url,
             headers={
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
             }
         )
-        fp = urllib.request.urlopen(req)
-        data = fp.read()
-        fp.close()
+        data = req.content
         if binary:
             fp = open(slug, mode="wb")
             fp.write(data)
@@ -180,7 +177,7 @@ def get_url(url):
         return cached_parsed
     details = {}
     soup = BeautifulSoup(data, "html.parser")
-    post = soup.find("div", ["post", "page"])
+    post = soup.find("div", ["post", "page"], recursive=True)
     nav = soup.find_all("div", "pjgm-navigation")
     try:
         heading = post.find("h1", "pjgm-posttitle")
@@ -226,6 +223,8 @@ def get_url(url):
             #Special handling: I did not like the old Book I image. It was too tall. So here I replace it with an edited version Wyatt S Carpenter made.
             img_data = open("assets/unsong book i fixed.png", "rb").read()
         else:
+            # Not-so-special handling: here we throw out everything after a ?w= so that we can get bigger sizes of most images.
+            img_url = img_url.split("?w=")[0]
             img_data = fetch_or_get(img_url, binary=True)
         img_type = "image/" #vague to avoid having to detect specific image type.
         img["src"] = "data:%s;base64,%s" % (img_type, encodebytes(img_data).decode("utf-8"))
